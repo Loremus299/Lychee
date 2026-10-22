@@ -34,7 +34,7 @@ class ArilOperation {
 		};
 	}
 
-	public response(status: string, zod: z.ZodObject) {
+	public response(status: string | number, zod: z.ZodObject) {
 		this.operation.responses[String(status)] = z.toJSONSchema(zod, {
 			target: "openapi-3.0",
 		});
