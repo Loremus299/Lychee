@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { unknown } from "zod";
 
 type Method = "get" | "post";
 
@@ -17,11 +17,20 @@ interface OpenAPIBody {
 	content: OpenAPIMedia;
 }
 
+type In = "path" | "query" | "header" | "cookie";
+interface OpenAPIParameter {
+	name: string;
+	in: In;
+	required: boolean;
+	schema: unknown;
+}
+
 interface OpenAPIOperation {
 	summary?: string;
 	description?: string;
 	tags?: string[];
 
+	parameters?: OpenAPIParameter[];
 	requestBody?: OpenAPIBody;
 	responses?: { [status: string]: OpenAPIResponse };
 }
@@ -76,6 +85,42 @@ class ArilOperation {
 				[type]: { schema: zod.toJSONSchema({ target: "openapi-3.0" }) },
 			},
 		};
+	}
+
+	private parameter(inn: In, zod: z.ZodObject) {
+		this.operation.parameters ??= [];
+
+		const jsonSchema = zod.toJSONSchema({ target: "openapi-3.0" });
+		for (const [name, schema] of Object.entries(zod.shape)) {
+			const property = jsonSchema.properties![name]!;
+			const meta = schema.meta();
+
+			this.operation.parameters.push({
+				name: name,
+				in: inn,
+				required:
+					(inn === "path" || jsonSchema.required?.includes(name)) ?? false,
+				...(meta?.description && { description: meta.description }),
+				...(meta?.example !== undefined && { example: meta.example }),
+				schema: property,
+			});
+		}
+	}
+
+	public path(zod: z.ZodObject) {
+		this.parameter("path", zod);
+	}
+
+	public query(zod: z.ZodObject) {
+		this.parameter("query", zod);
+	}
+
+	public header(zod: z.ZodObject) {
+		this.parameter("header", zod);
+	}
+
+	public cookie(zod: z.ZodObject) {
+		this.parameter("cookie", zod);
 	}
 }
 
