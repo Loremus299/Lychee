@@ -57,7 +57,7 @@ class ArilOperation {
 	}
 
 	public response(
-		status: string | number,
+		status: number,
 		description: string,
 		type: string,
 		zod: z.ZodType,
@@ -75,7 +75,12 @@ class ArilOperation {
 		res: Record<number, { description: string; type: string; zod: z.ZodType }>,
 	) {
 		for (const [status, details] of Object.entries(res)) {
-			this.response(status, details.description, details.type, details.zod);
+			this.response(
+				Number(status),
+				details.description,
+				details.type,
+				details.zod,
+			);
 		}
 	}
 
