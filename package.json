@@ -1,0 +1,43 @@
+{
+	"name": "lychee",
+	"version": "1.0.0",
+	"description": "OpenAPI 3.0 documentation generator for your backend.",
+	"keywords": [
+		"documentation",
+		"openapi",
+		"zod"
+	],
+	"homepage": "https://github.com/Loremus299/Lychee#readme",
+	"bugs": {
+		"url": "https://github.com/Loremus299/Lychee/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Loremus299/Lychee.git"
+	},
+	"scripts": {
+		"generate": "tsdown"
+	},
+	"license": "MIT",
+	"author": "Loremus",
+	"dependencies": {
+		"tsdown": "^0.23.1",
+		"typescript": "^7.0.2",
+		"zod": "^4.6.7"
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/index.d.mts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		}
+	}
+}
