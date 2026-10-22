@@ -2,9 +2,19 @@ import z from "zod";
 
 type Method = "get" | "post";
 
+interface OpenAPIMedia {
+	[type: string]: {
+		schema: unknown;
+	};
+}
+
 interface OpenAPIResponse {
 	description: string;
-	content: { [type: string]: { schema: unknown } };
+	content: OpenAPIMedia;
+}
+
+interface OpenAPIBody {
+	content: OpenAPIMedia;
 }
 
 interface OpenAPIOperation {
@@ -12,6 +22,7 @@ interface OpenAPIOperation {
 	description?: string;
 	tags?: string[];
 
+	requestBody?: OpenAPIBody;
 	responses?: { [status: string]: OpenAPIResponse };
 }
 
@@ -57,6 +68,14 @@ class ArilOperation {
 		for (const [status, details] of Object.entries(res)) {
 			this.response(status, details.description, details.type, details.zod);
 		}
+	}
+
+	public body(type: string, zod: z.ZodType) {
+		this.operation.requestBody = {
+			content: {
+				[type]: { schema: zod.toJSONSchema({ target: "openapi-3.0" }) },
+			},
+		};
 	}
 }
 

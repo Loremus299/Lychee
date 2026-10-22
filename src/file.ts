@@ -9,8 +9,10 @@ const createTaskInProjectPath = z.strictObject({
 });
 
 const createTaskBody = z.object({
-	name: z.string(),
-	description: z.string(),
+	name: z.string().meta({ description: "Task Name", example: "Fuck a queer" }),
+	description: z
+		.string()
+		.meta({ description: "Task Description", example: "Fuck my husband" }),
 	priority: z.enum(["high", "medium", "low"]),
 });
 
@@ -48,6 +50,7 @@ const createTask401 = z.strictObject({
 
 const docs = new Aril("3.0.0", { title: "Test API", version: "1.0.0" });
 const createTask = docs.path("/{project}/create-task", "post", {});
+createTask.body("application/json", createTaskBody);
 createTask.response(
 	200,
 	"Successfully created task",
