@@ -1,4 +1,4 @@
-import z, { unknown } from "zod";
+import z from "zod";
 
 type Method = "get" | "post";
 
