@@ -40,7 +40,7 @@ class ArilOperation {
 		status: string | number,
 		description: string,
 		type: string,
-		zod: z.ZodObject,
+		zod: z.ZodType,
 	) {
 		this.operation.responses ??= {};
 		this.operation.responses[String(status)] = {
@@ -52,10 +52,7 @@ class ArilOperation {
 	}
 
 	public responses(
-		res: Record<
-			number,
-			{ description: string; type: string; zod: z.ZodObject }
-		>,
+		res: Record<number, { description: string; type: string; zod: z.ZodType }>,
 	) {
 		for (const [status, details] of Object.entries(res)) {
 			this.response(status, details.description, details.type, details.zod);
