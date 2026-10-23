@@ -151,9 +151,15 @@ interface OpenAPIPath {
 	};
 }
 
+interface OpenAPIServer {
+	url: string;
+	description?: string;
+}
+
 interface OpenAPI {
 	openapi: string;
 	info: InfoObject;
+	servers?: OpenAPIServer[];
 
 	paths: OpenAPIPath;
 }
@@ -167,6 +173,13 @@ export class Aril {
 
 	public get docs() {
 		return this.json;
+	}
+
+	public servers(servs: OpenAPIServer[]) {
+		this.json.servers ??= [];
+		for (const serv of servs) {
+			this.json.servers.push({ description: serv.description, url: serv.url });
+		}
 	}
 
 	public path(
