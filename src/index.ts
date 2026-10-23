@@ -1,6 +1,14 @@
 import z from "zod";
 
-type Method = "get" | "post";
+type Method =
+	| "get"
+	| "put"
+	| "post"
+	| "delete"
+	| "options"
+	| "head"
+	| "patch"
+	| "trace";
 
 interface OpenAPIMedia {
 	[type: string]: {
