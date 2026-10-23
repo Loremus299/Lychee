@@ -47,6 +47,23 @@ interface OpenAPIOperation {
 	responses?: { [status: string]: OpenAPIResponse };
 }
 
+type OperationConfig = {
+	path?: z.ZodObject;
+	query?: z.ZodObject;
+	header?: z.ZodObject;
+	cookie?: z.ZodObject;
+	body?: {
+		type: string;
+		description?: string;
+		required?: boolean;
+		zod: z.ZodType;
+	};
+	responses?: Record<
+		number,
+		{ description: string; type: string; zod: z.ZodType }
+	>;
+};
+
 class ArilOperation {
 	private readonly operation: OpenAPIOperation;
 
@@ -147,6 +164,22 @@ class ArilOperation {
 		this.parameter("cookie", zod);
 	}
 
+	public apply({
+		path,
+		query,
+		header,
+		cookie,
+		body,
+		responses,
+	}: OperationConfig) {
+		if (path) this.path(path);
+		if (query) this.query(query);
+		if (header) this.header(header);
+		if (cookie) this.cookie(cookie);
+		if (body) this.body(body.type, body.zod, body.required, body.description);
+		if (responses) this.responses(responses);
+	}
+
 	public documentFunction<
 		P extends z.ZodObject = never,
 		Q extends z.ZodObject = never,
@@ -172,12 +205,7 @@ class ArilOperation {
 		body?: { type: string; description?: string; required?: boolean; zod: B };
 		responses?: R;
 	}) {
-		if (path) this.path(path);
-		if (query) this.query(query);
-		if (header) this.header(header);
-		if (cookie) this.cookie(cookie);
-		if (body) this.body(body.type, body.zod, body.required, body.description);
-		if (responses) this.responses(responses);
+		this.apply({ path, query, header, cookie, body, responses });
 
 		type Req<
 			P extends z.ZodType,
@@ -200,6 +228,24 @@ class ArilOperation {
 		return <A extends unknown[]>(
 			fn: (req: Req<P, Q, H, C, B>, ...rest: A) => Promise<Res<R>>,
 		) => fn;
+	}
+}
+
+class ArilMiddleware {
+	constructor(
+		private readonly ctx: Aril,
+		private readonly prefix: string,
+		private readonly config: OperationConfig,
+	) {}
+
+	public path(
+		path: string,
+		method: Method,
+		meta: { summary?: string; description?: string; tags?: string[] },
+	) {
+		const op = this.ctx.path(this.prefix + path, method, meta);
+		op.apply(this.config);
+		return op;
 	}
 }
 
@@ -260,5 +306,9 @@ export class Aril {
 			description,
 			tags,
 		});
+	}
+
+	public middleware(prefix: string, config: OperationConfig) {
+		return new ArilMiddleware(this, prefix, config);
 	}
 }
