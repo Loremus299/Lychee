@@ -1,6 +1,6 @@
 {
 	"name": "@loremus299/lychee",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "OpenAPI 3.0 documentation generator for your backend.",
 	"keywords": [
 		"documentation",
