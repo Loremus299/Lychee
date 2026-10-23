@@ -142,6 +142,7 @@ class ArilOperation {
 
 interface InfoObject {
 	title: string;
+	description?: string;
 	version: string;
 }
 
