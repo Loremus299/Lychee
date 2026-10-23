@@ -14,6 +14,8 @@ interface OpenAPIResponse {
 }
 
 interface OpenAPIBody {
+	description?: string;
+	required?: boolean;
 	content: OpenAPIMedia;
 }
 
@@ -23,6 +25,8 @@ interface OpenAPIParameter {
 	in: In;
 	required: boolean;
 	schema: unknown;
+	description?: string;
+	example?: string;
 }
 
 interface OpenAPIOperation {
@@ -84,8 +88,15 @@ class ArilOperation {
 		}
 	}
 
-	public body(type: string, zod: z.ZodType) {
+	public body(
+		type: string,
+		zod: z.ZodType,
+		required?: boolean,
+		description?: string,
+	) {
 		this.operation.requestBody = {
+			description,
+			required,
 			content: {
 				[type]: { schema: zod.toJSONSchema({ target: "openapi-3.0" }) },
 			},
