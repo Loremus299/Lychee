@@ -146,6 +146,61 @@ class ArilOperation {
 	public cookie(zod: z.ZodObject) {
 		this.parameter("cookie", zod);
 	}
+
+	public documentFunction<
+		P extends z.ZodObject = never,
+		Q extends z.ZodObject = never,
+		H extends z.ZodObject = never,
+		C extends z.ZodObject = never,
+		B extends z.ZodType = never,
+		R extends Record<
+			number,
+			{ description: string; type: string; zod: z.ZodType }
+		> = {},
+	>({
+		path,
+		query,
+		header,
+		cookie,
+		body,
+		responses,
+	}: {
+		path?: P;
+		query?: Q;
+		header?: H;
+		cookie?: C;
+		body?: { type: string; description?: string; required?: boolean; zod: B };
+		responses?: R;
+	}) {
+		if (path) this.path(path);
+		if (query) this.query(query);
+		if (header) this.header(header);
+		if (cookie) this.cookie(cookie);
+		if (body) this.body(body.type, body.zod, body.required, body.description);
+		if (responses) this.responses(responses);
+
+		type Req<
+			P extends z.ZodType,
+			Q extends z.ZodType,
+			H extends z.ZodType,
+			C extends z.ZodType,
+			B extends z.ZodType,
+		> = ([P] extends [never] ? {} : { path: z.infer<P> }) &
+			([Q] extends [never] ? {} : { query: z.infer<Q> }) &
+			([H] extends [never] ? {} : { header: z.infer<H> }) &
+			([C] extends [never] ? {} : { cookie: z.infer<C> }) &
+			([B] extends [never] ? {} : { body: z.infer<B> });
+
+		type Res<R extends Record<number, { zod: z.ZodType }>> = {
+			[K in keyof R]: R[K] extends { zod: infer Z extends z.ZodType }
+				? { [P in K]: z.infer<Z> }
+				: never;
+		}[keyof R];
+
+		return <A extends unknown[]>(
+			fn: (req: Req<P, Q, H, C, B>, ...rest: A) => Promise<Res<R>>,
+		) => fn;
+	}
 }
 
 interface InfoObject {
