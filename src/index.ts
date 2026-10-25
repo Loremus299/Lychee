@@ -41,6 +41,7 @@ interface OpenAPIOperation {
 	summary?: string;
 	description?: string;
 	tags?: string[];
+	operationId?: string;
 
 	parameters?: OpenAPIParameter[];
 	requestBody?: OpenAPIBody;
@@ -75,10 +76,17 @@ class ArilOperation {
 			summary,
 			description,
 			tags,
-		}: { summary?: string; description?: string; tags?: string[] },
+			operationId,
+		}: {
+			summary?: string;
+			description?: string;
+			tags?: string[];
+			operationId?: string;
+		},
 	) {
 		ctx.docs.paths[path] ??= {};
 		this.operation = ctx.docs.paths[path][method] ??= {
+			...(operationId && { operationId: operationId }),
 			...(summary && { summary: summary }),
 			...(description && { description: description }),
 			...(tags && { tags: tags }),
@@ -241,7 +249,12 @@ class ArilMiddleware {
 	public path(
 		path: string,
 		method: Method,
-		meta: { summary?: string; description?: string; tags?: string[] },
+		meta: {
+			summary?: string;
+			description?: string;
+			tags?: string[];
+			operationId?: string;
+		},
 	) {
 		const op = this.ctx.path(this.prefix + path, method, meta);
 		op.apply(this.config);
@@ -299,12 +312,19 @@ export class Aril {
 			summary,
 			description,
 			tags,
-		}: { summary?: string; description?: string; tags?: string[] },
+			operationId,
+		}: {
+			summary?: string;
+			description?: string;
+			tags?: string[];
+			operationId?: string;
+		},
 	) {
 		return new ArilOperation(this, path, method, {
 			summary,
 			description,
 			tags,
+			operationId,
 		});
 	}
 
