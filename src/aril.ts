@@ -4,6 +4,7 @@ import type {
 	InfoObject,
 	Method,
 	OpenAPI,
+	OpenAPIOperation,
 	OpenAPIServer,
 	OperationConfig,
 } from "./types.js";
@@ -29,24 +30,9 @@ export class Aril {
 	public path(
 		path: string,
 		method: Method,
-		{
-			summary,
-			description,
-			tags,
-			operationId,
-		}: {
-			summary?: string;
-			description?: string;
-			tags?: string[];
-			operationId?: string;
-		},
+		meta: Omit<OpenAPIOperation, "parameters" | "responses" | "requestBody">,
 	) {
-		return new ArilOperation(this, path, method, {
-			summary,
-			description,
-			tags,
-			operationId,
-		});
+		return new ArilOperation(this, path, method, meta);
 	}
 
 	public middleware(prefix: string, config: OperationConfig) {

@@ -9,24 +9,11 @@ export class ArilOperation {
 		ctx: Aril,
 		path: string,
 		method: Method,
-		{
-			summary,
-			description,
-			tags,
-			operationId,
-		}: {
-			summary?: string;
-			description?: string;
-			tags?: string[];
-			operationId?: string;
-		},
+		meta: Omit<OpenAPIOperation, "parameters" | "responses" | "requestBody">,
 	) {
 		ctx.docs.paths[path] ??= {};
 		this.operation = ctx.docs.paths[path][method] ??= {
-			...(operationId && { operationId: operationId }),
-			...(summary && { summary: summary }),
-			...(description && { description: description }),
-			...(tags && { tags: tags }),
+			...meta,
 		};
 	}
 
