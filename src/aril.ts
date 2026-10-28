@@ -7,7 +7,7 @@ import type {
 	OpenAPIOperation,
 	OpenAPIServer,
 	OperationConfig,
-} from "./types.js";
+} from "./types";
 
 export class Aril {
 	private readonly json: OpenAPI;
